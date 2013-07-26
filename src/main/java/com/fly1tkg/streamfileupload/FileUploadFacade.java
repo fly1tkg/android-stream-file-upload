@@ -107,7 +107,7 @@ public class FileUploadFacade {
         });
     }
 
-    private void upload(HttpUriRequest request, FileUploadCallback callback) {
+    protected void upload(HttpUriRequest request, FileUploadCallback callback) {
         int statusCode = -1;
         String responseBody = null;
         try {
