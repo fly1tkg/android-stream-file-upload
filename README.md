@@ -9,6 +9,10 @@ Simple stream file upload library! You won't worry about "OutOfMemory".
 
 The File upload will be done in background.
 
+#Jar download
+
+https://github.com/fly1tkg/android-stream-file-upload/tree/master/jar
+
 #How to Use
     new FileUploadFacade fileUploadFacade = new FileUploadFacade();
     String url = "http://posturl.com" // post url
@@ -25,6 +29,11 @@ The File upload will be done in background.
         }
     });
     
+# How to create Jar
+    mvn clean package
     
+or assemble with dependency
+
+    mvn clean compile assembly:single
 
 
