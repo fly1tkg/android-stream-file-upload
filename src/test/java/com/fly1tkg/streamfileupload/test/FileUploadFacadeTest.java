@@ -38,10 +38,13 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import com.fly1tkg.streamfileupload.FileUploadCallback;
 import com.fly1tkg.streamfileupload.FileUploadFacade;
 
+@RunWith(RobolectricTestRunner.class)
 public class FileUploadFacadeTest {
     private static final String URL = "http://hogehoge.com";
     private static final String FILE_KEY = "filekey";

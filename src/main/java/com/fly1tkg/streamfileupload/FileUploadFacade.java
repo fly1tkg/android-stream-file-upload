@@ -36,16 +36,21 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import android.os.Handler;
+
 public class FileUploadFacade {
     private static final String DEFAULT_FILE_KEY = "file";
     private HttpClient mHttpClient;
+    private Handler mHandler;
 
     public FileUploadFacade() {
         mHttpClient = new DefaultHttpClient();
+        mHandler = new Handler();
     };
 
     public FileUploadFacade(HttpClient httpClient) {
         mHttpClient = httpClient;
+        mHandler = new Handler();
     }
 
     public void post(String url, File file, FileUploadCallback callback) {
@@ -120,11 +125,31 @@ public class FileUploadFacade {
                 throw new HttpResponseException(status.getStatusCode(), status.getReasonPhrase());
             }
 
-            callback.onSuccess(statusCode, responseBody);
+            sendSuccess(callback, statusCode, responseBody);
         } catch (HttpResponseException e) {
-            callback.onFailure(statusCode, responseBody, e);
+            sendFailure(callback, statusCode, responseBody, e);
         } catch (IOException e) {
-            callback.onFailure(statusCode, responseBody, e);
+            sendFailure(callback, statusCode, responseBody, e);
         }
+    }
+
+    private void sendSuccess(final FileUploadCallback callback, final int statusCode, final String response) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                callback.onSuccess(statusCode, response);
+            }
+        });
+    }
+
+    private void sendFailure(final FileUploadCallback callback, final int statusCode, final String response,
+            final Throwable e) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                callback.onFailure(statusCode, response, e);
+            }
+        });
     }
 }
