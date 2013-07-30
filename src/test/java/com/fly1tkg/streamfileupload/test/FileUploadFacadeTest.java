@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.mime.FormBodyPart;
@@ -212,7 +213,7 @@ public class FileUploadFacadeTest {
         HttpUriRequest request;
 
         @Override
-        protected void upload(HttpUriRequest request, FileUploadCallback callback) {
+        protected void upload(HttpEntityEnclosingRequestBase request, FileUploadCallback callback) {
             this.request = request;
             callback.onSuccess(0, null);
         }

@@ -27,7 +27,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -39,6 +41,10 @@ import org.apache.http.util.EntityUtils;
 import android.os.Handler;
 
 public class FileUploadFacade {
+    private enum HttpMethod {
+        POST, PUT
+    }
+
     private static final String DEFAULT_FILE_KEY = "file";
     private HttpClient mHttpClient;
     private Handler mHandler;
@@ -80,31 +86,30 @@ public class FileUploadFacade {
         executorService.execute(new Runnable() {
             public void run() {
                 try {
-                    HttpPost httpPost = new HttpPost(url);
+                    HttpEntityEnclosingRequestBase request = createRequest(HttpMethod.POST, url);
+                    request.setEntity(createEntity(fileKey, file, contentType, params));
+                    upload(request, callback);
+                } catch (UnsupportedEncodingException e) {
+                    callback.onFailure(-1, null, e);
+                }
+            }
+        });
+    }
+    
+    public void put(final String url, final String fileKey, final File file, final String contentType,
+            final Map<String, String> params, final FileUploadCallback callback) {
 
-                    FileBody fileBody;
-                    if (null == contentType) {
-                        fileBody = new FileBody(file);
-                    } else {
-                        fileBody = new FileBody(file, contentType);
-                    }
+        if (null == callback) {
+            throw new RuntimeException("FileUploadCallback should not be null.");
+        }
 
-                    MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
-                    if (null == fileKey) {
-                        entity.addPart(DEFAULT_FILE_KEY, fileBody);
-                    } else {
-                        entity.addPart(fileKey, fileBody);
-                    }
-
-                    if (null != params) {
-                        for (Map.Entry<String, String> e : params.entrySet()) {
-                            entity.addPart(e.getKey(), new StringBody(e.getValue()));
-                        }
-                    }
-
-                    httpPost.setEntity(entity);
-
-                    upload(httpPost, callback);
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        executorService.execute(new Runnable() {
+            public void run() {
+                try {
+                    HttpEntityEnclosingRequestBase request = createRequest(HttpMethod.PUT, url);
+                    request.setEntity(createEntity(fileKey, file, contentType, params));
+                    upload(request, callback);
                 } catch (UnsupportedEncodingException e) {
                     callback.onFailure(-1, null, e);
                 }
@@ -112,7 +117,39 @@ public class FileUploadFacade {
         });
     }
 
-    protected void upload(HttpUriRequest request, FileUploadCallback callback) {
+    private HttpEntityEnclosingRequestBase createRequest(HttpMethod method, String url) {
+        if (method == HttpMethod.POST) {
+            return new HttpPost(url);
+        } else {
+            return new HttpPut(url);
+        }
+    }
+
+    private MultipartEntity createEntity(String fileKey, File file, String contentType, Map<String, String> params)
+            throws UnsupportedEncodingException {
+        MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+        FileBody fileBody;
+        if (null == contentType) {
+            fileBody = new FileBody(file);
+        } else {
+            fileBody = new FileBody(file, contentType);
+        }
+
+        if (null == fileKey) {
+            entity.addPart(DEFAULT_FILE_KEY, fileBody);
+        } else {
+            entity.addPart(fileKey, fileBody);
+        }
+
+        if (null != params) {
+            for (Map.Entry<String, String> e : params.entrySet()) {
+                entity.addPart(e.getKey(), new StringBody(e.getValue()));
+            }
+        }
+        return entity;
+    }
+
+    protected void upload(HttpEntityEnclosingRequestBase request, FileUploadCallback callback) {
         int statusCode = -1;
         String responseBody = null;
         try {
