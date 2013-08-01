@@ -95,7 +95,23 @@ public class FileUploadFacade {
             }
         });
     }
-    
+
+    public void put(String url, File file, FileUploadCallback callback) {
+        put(url, null, file, null, null, callback);
+    }
+
+    public void put(String url, String fileKey, File file, FileUploadCallback callback) {
+        put(url, fileKey, file, null, null, callback);
+    }
+
+    public void put(String url, File file, Map<String, String> params, FileUploadCallback callback) {
+        put(url, null, file, null, params, callback);
+    }
+
+    public void put(String url, String fileKey, File file, Map<String, String> params, FileUploadCallback callback) {
+        put(url, fileKey, file, null, params, callback);
+    }
+
     public void put(final String url, final String fileKey, final File file, final String contentType,
             final Map<String, String> params, final FileUploadCallback callback) {
 
