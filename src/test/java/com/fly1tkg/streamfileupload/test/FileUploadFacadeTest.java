@@ -296,8 +296,8 @@ public class FileUploadFacadeTest {
 
     private Map<String, ContentBody> getBodyMap(HttpUriRequest request)
             throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        HttpPost httpPost = (HttpPost) request;
-        MultipartEntity entity = (MultipartEntity) httpPost.getEntity();
+        HttpEntityEnclosingRequestBase httpRequest = (HttpEntityEnclosingRequestBase) request;
+        MultipartEntity entity = (MultipartEntity) httpRequest.getEntity();
         Field multipartField = MultipartEntity.class.getDeclaredField("multipart");
         multipartField.setAccessible(true);
         HttpMultipart httpMultipart = (HttpMultipart) multipartField.get(entity);
