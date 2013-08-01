@@ -178,6 +178,113 @@ public class FileUploadFacadeTest {
         assertEquals(CONTENT_TYPE, fileBody.getMimeType());
         assertEquals("value", stringBodyToString((StringBody) parts.get("key")));
     }
+    @Test
+    public void put() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        final FileUploadFacadeTestClass fileUploadFacadeTestClass = new FileUploadFacadeTestClass();
+        fileUploadFacadeTestClass.put(URL, FILE, new FileUploadCallback() {
+            public void onSuccess(int statusCode, String response) {
+                mRequest = fileUploadFacadeTestClass.request;
+            }
+
+            public void onFailure(int statusCode, String response, Throwable e) {}
+        });
+        await().until(isSetHttpUriRequest());
+
+        assert (mRequest instanceof HttpPost);
+        assertEquals(URL, mRequest.getURI().toString());
+
+        Map<String, ContentBody> parts = getBodyMap(mRequest);
+        assert (parts.containsKey("file"));
+        assertEquals(FILE, ((FileBody) parts.get("file")).getFile());
+    }
+
+    @Test
+    public void put1() throws SecurityException, NoSuchFieldException, IllegalArgumentException,
+            IllegalAccessException {
+        final FileUploadFacadeTestClass fileUploadFacadeTestClass = new FileUploadFacadeTestClass();
+        fileUploadFacadeTestClass.put(URL, FILE_KEY, FILE, new FileUploadCallback() {
+            public void onSuccess(int statusCode, String response) {
+                mRequest = fileUploadFacadeTestClass.request;
+            }
+
+            public void onFailure(int statusCode, String response, Throwable e) {}
+        });
+        await().until(isSetHttpUriRequest());
+
+        assert (mRequest instanceof HttpPost);
+        assertEquals(URL, mRequest.getURI().toString());
+
+        Map<String, ContentBody> parts = getBodyMap(mRequest);
+        assert (parts.containsKey(FILE_KEY));
+        assertEquals(FILE, ((FileBody) parts.get(FILE_KEY)).getFile());
+    }
+
+    @Test
+    public void put2() throws SecurityException, NoSuchFieldException, IllegalArgumentException,
+            IllegalAccessException, UnsupportedEncodingException {
+        final FileUploadFacadeTestClass fileUploadFacadeTestClass = new FileUploadFacadeTestClass();
+        fileUploadFacadeTestClass.put(URL, FILE, PARAMS, new FileUploadCallback() {
+            public void onSuccess(int statusCode, String response) {
+                mRequest = fileUploadFacadeTestClass.request;
+            }
+
+            public void onFailure(int statusCode, String response, Throwable e) {}
+        });
+        await().until(isSetHttpUriRequest());
+
+        assert (mRequest instanceof HttpPost);
+        assertEquals(URL, mRequest.getURI().toString());
+
+        Map<String, ContentBody> parts = getBodyMap(mRequest);
+        assertEquals(FILE, ((FileBody) parts.get("file")).getFile());
+        assertEquals("value", stringBodyToString((StringBody) parts.get("key")));
+    }
+
+    @Test
+    public void put3() throws SecurityException, NoSuchFieldException, IllegalArgumentException,
+            IllegalAccessException {
+        final FileUploadFacadeTestClass fileUploadFacadeTestClass = new FileUploadFacadeTestClass();
+        fileUploadFacadeTestClass.put(URL, FILE_KEY, FILE, PARAMS, new FileUploadCallback() {
+            public void onSuccess(int statusCode, String response) {
+                mRequest = fileUploadFacadeTestClass.request;
+            }
+
+            public void onFailure(int statusCode, String response, Throwable e) {}
+        });
+        await().until(isSetHttpUriRequest());
+
+        assert (mRequest instanceof HttpPost);
+        assertEquals(URL, mRequest.getURI().toString());
+
+        Map<String, ContentBody> parts = getBodyMap(mRequest);
+        assert (parts.containsKey(FILE_KEY));
+        assertEquals(FILE, ((FileBody) parts.get(FILE_KEY)).getFile());
+        assertEquals("value", stringBodyToString((StringBody) parts.get("key")));
+    }
+
+    @Test
+    public void put4() throws SecurityException, NoSuchFieldException, IllegalArgumentException,
+            IllegalAccessException {
+        final FileUploadFacadeTestClass fileUploadFacadeTestClass = new FileUploadFacadeTestClass();
+        fileUploadFacadeTestClass.put(URL, FILE_KEY, FILE, CONTENT_TYPE, PARAMS, new FileUploadCallback() {
+            public void onSuccess(int statusCode, String response) {
+                mRequest = fileUploadFacadeTestClass.request;
+            }
+
+            public void onFailure(int statusCode, String response, Throwable e) {}
+        });
+        await().until(isSetHttpUriRequest());
+
+        assert (mRequest instanceof HttpPost);
+        assertEquals(URL, mRequest.getURI().toString());
+
+        Map<String, ContentBody> parts = getBodyMap(mRequest);
+        assert (parts.containsKey(FILE_KEY));
+        FileBody fileBody = (FileBody) parts.get(FILE_KEY);
+        assertEquals(FILE, fileBody.getFile());
+        assertEquals(CONTENT_TYPE, fileBody.getMimeType());
+        assertEquals("value", stringBodyToString((StringBody) parts.get("key")));
+    }
 
     private Callable<Boolean> isSetHttpUriRequest() {
         return new Callable<Boolean>() {
